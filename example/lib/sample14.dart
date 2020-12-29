@@ -55,7 +55,7 @@ class _Sample14State extends State<Sample14> {
           //width: MediaQuery.of(context).size.width,
           child: BezierChart(
             fromDate: fromDate,
-            bezierChartScale: BezierChartScale.WEEKLY,
+            bezierChartScale: BezierChartScale.HOURLY,
             toDate: toDate,
             onIndicatorVisible: (val) {
               print("Indicator Visible :$val");

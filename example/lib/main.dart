@@ -111,7 +111,7 @@ class MyHomePage extends StatelessWidget {
             ),
             ListTile(
               title: Text("Sample 9"),
-              subtitle: Text("BezierChartScale.WEEKLY same day"),
+              subtitle: Text("BezierChartScale.HOURLY same day"),
               onTap: () => _onTap(
                 context,
                 sample9(context),
@@ -351,7 +351,7 @@ Widget sample3(BuildContext context) {
       width: MediaQuery.of(context).size.width,
       child: BezierChart(
         fromDate: fromDate,
-        bezierChartScale: BezierChartScale.WEEKLY,
+        bezierChartScale: BezierChartScale.HOURLY,
         toDate: toDate,
         onIndicatorVisible: (val) {
           print("Indicator Visible :$val");
@@ -419,7 +419,7 @@ Widget sample4(BuildContext context) {
       height: MediaQuery.of(context).size.height / 2,
       width: MediaQuery.of(context).size.width,
       child: BezierChart(
-        bezierChartScale: BezierChartScale.MONTHLY,
+        bezierChartScale: BezierChartScale.HOURLY,
         fromDate: fromDate,
         toDate: toDate,
         selectedDate: toDate,
@@ -478,7 +478,7 @@ Widget sample5(BuildContext context) {
       height: MediaQuery.of(context).size.height / 2,
       width: MediaQuery.of(context).size.width,
       child: BezierChart(
-        bezierChartScale: BezierChartScale.YEARLY,
+        bezierChartScale: BezierChartScale.HOURLY,
         fromDate: fromDate,
         toDate: toDate,
         selectedDate: toDate,
@@ -565,7 +565,7 @@ Widget sample6(BuildContext context) {
           ),
         ),
         _buildChart(
-          BezierChartScale.MONTHLY,
+          BezierChartScale.HOURLY,
           context,
           LinearGradient(
             colors: [
@@ -580,7 +580,7 @@ Widget sample6(BuildContext context) {
           ),
         ),
         _buildChart(
-            BezierChartScale.YEARLY,
+            BezierChartScale.HOURLY,
             context,
             LinearGradient(
               colors: [
@@ -759,18 +759,14 @@ Widget sample7(BuildContext context) {
 
 //SAMPLE 8 Hourly Chart
 Widget sample8(BuildContext context) {
-  final fromDate = DateTime.now().subtract(Duration(hours: 50));
+  final fromDate = DateTime.now().subtract(Duration(minutes:1001));
   final toDate = DateTime.now();
 
-  final date1 = toDate.subtract(Duration(hours: 2));
-  final date2 = toDate.subtract(Duration(hours: 3));
+  List<DataPoint<DateTime>> data = List() ;
 
-  final date3 = toDate.subtract(Duration(hours: 10));
-  final date4 = toDate.subtract(Duration(hours: 15));
-
-  final date5 = toDate.subtract(Duration(hours: 19));
-  final date6 = toDate.subtract(Duration(hours: 26));
-
+  for(int i = 0 ; i<1000 ; i++){
+    data.add(DataPoint<DateTime>(value: (i%20).toDouble() , xAxis: toDate.subtract(Duration(minutes: i , seconds: i)))) ;
+  }
   return Center(
     child: Container(
       color: Colors.red,
@@ -778,23 +774,22 @@ Widget sample8(BuildContext context) {
       width: MediaQuery.of(context).size.width,
       child: BezierChart(
         bezierChartScale: BezierChartScale.HOURLY,
+
         fromDate: fromDate,
         toDate: toDate,
         selectedDate: toDate,
+
+        onScaleChanged: (BezierChartScale data) {
+
+        },
         series: [
           BezierLine(
             label: "Duty",
-            data: [
-              DataPoint<DateTime>(value: 0, xAxis: date1),
-              DataPoint<DateTime>(value: 50, xAxis: date2),
-              DataPoint<DateTime>(value: 100, xAxis: date3),
-              DataPoint<DateTime>(value: 100, xAxis: date4),
-              DataPoint<DateTime>(value: 40, xAxis: date5),
-              DataPoint<DateTime>(value: 47, xAxis: date6),
-            ],
+            data: data
           ),
         ],
         config: BezierChartConfig(
+          pinchZoom: true,
           verticalIndicatorStrokeWidth: 3.0,
           verticalIndicatorColor: Colors.black26,
           showVerticalIndicator: true,
@@ -825,7 +820,7 @@ Widget sample8(BuildContext context) {
   );
 }
 
-//Example of the problem with BezierChartScale.WEEKLY
+//Example of the problem with BezierChartScale.HOURLY
 Widget sample9(BuildContext context) {
   int dateInt1 = 1562013034796;
   int dateInt2 = 1562079398067;
@@ -842,7 +837,7 @@ Widget sample9(BuildContext context) {
       width: MediaQuery.of(context).size.width,
       child: BezierChart(
         fromDate: fromDate,
-        bezierChartScale: BezierChartScale.WEEKLY,
+        bezierChartScale: BezierChartScale.HOURLY,
         toDate: toDate,
         onIndicatorVisible: (val) {
           print("Indicator Visible :$val");
@@ -897,7 +892,7 @@ Widget sample11(BuildContext context) {
       //width: MediaQuery.of(context).size.width,
       child: BezierChart(
         fromDate: fromDate,
-        bezierChartScale: BezierChartScale.WEEKLY,
+        bezierChartScale: BezierChartScale.HOURLY,
         toDate: toDate,
         onIndicatorVisible: (val) {
           print("Indicator Visible :$val");

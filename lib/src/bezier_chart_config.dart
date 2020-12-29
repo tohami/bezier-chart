@@ -3,11 +3,10 @@ import 'package:intl/intl.dart';
 
 /// Type of Bezier line Chart
 enum BezierChartScale {
+  MINUTE,
+  TEN_MINUTE,
+  HALF_HOUR,
   HOURLY,
-  WEEKLY,
-  MONTHLY,
-  YEARLY,
-
   ///numbers sorted in an increasing way.
   CUSTOM,
 }

@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:bezier_chart/bezier_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
@@ -106,7 +109,7 @@ class MyHomePage extends StatelessWidget {
               subtitle: Text("Hourly Chart"),
               onTap: () => _onTap(
                 context,
-                sample8(context),
+                Sample8(),
               ),
             ),
             ListTile(
@@ -758,66 +761,98 @@ Widget sample7(BuildContext context) {
 }
 
 //SAMPLE 8 Hourly Chart
-Widget sample8(BuildContext context) {
-  final fromDate = DateTime.now().subtract(Duration(minutes:1001));
-  final toDate = DateTime.now();
+class Sample8 extends StatefulWidget {
+  @override
+  _Sample8State createState() => _Sample8State();
+}
 
-  List<DataPoint<DateTime>> data = List() ;
+class _Sample8State extends State<Sample8> with SingleTickerProviderStateMixin {
+  AnimationController _controller;
+  final fromDate = DateTime.now();
+  DateTime toDate ;
+  DateTime selectedDate ;
+  List<DataPoint<DateTime>> data = List();
 
-  for(int i = 0 ; i<1000 ; i++){
-    data.add(DataPoint<DateTime>(value: (i%20).toDouble() , xAxis: toDate.subtract(Duration(minutes: i , seconds: i)))) ;
+  @override
+  void initState() {
+    _controller = AnimationController(vsync: this);
+    super.initState();
+    var rng = new Random();
+    for (int i = 0; i < 3; i++) {
+      data.add(DataPoint<DateTime>(
+          value: rng.nextInt(20).toDouble(),
+          xAxis: fromDate.add(Duration(minutes: i))));
+    }
+    toDate =fromDate.add(Duration(minutes: 4)) ;
+    Timer.periodic(Duration(seconds: 5), (timer) {
+      data.add(DataPoint<DateTime>(
+          value: rng.nextInt(20).toDouble(),
+          xAxis: data.last.xAxis.add(Duration(minutes: 1))));
+
+      setState(() {
+        selectedDate = data.last.xAxis ;
+        toDate = selectedDate;
+             });
+    });
   }
-  return Center(
-    child: Container(
-      color: Colors.red,
-      height: MediaQuery.of(context).size.height / 2,
-      width: MediaQuery.of(context).size.width,
-      child: BezierChart(
-        bezierChartScale: BezierChartScale.HOURLY,
 
-        fromDate: fromDate,
-        toDate: toDate,
-        selectedDate: toDate,
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
-        onScaleChanged: (BezierChartScale data) {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        color: Colors.red,
+        height: MediaQuery.of(context).size.height / 2,
+        width: MediaQuery.of(context).size.width,
+        child: BezierChart(
+          bezierChartScale: BezierChartScale.MINUTE,
+          fromDate: fromDate,
+          toDate: toDate,
+          selectedDate: selectedDate,
+          bezierChartAggregation: BezierChartAggregation.AVERAGE,
+          onScaleChanged: (BezierChartScale data) {},
+          series: [
+            BezierLine(label: "Duty", data: data),
+          ],
+          config: BezierChartConfig(
+            pinchZoom: true,
+            verticalIndicatorStrokeWidth: 3.0,
+            verticalIndicatorColor: Colors.black26,
+            showVerticalIndicator: true,
+            verticalIndicatorFixedPosition: true,
+            displayDataPointWhenNoValue: false,
 
-        },
-        series: [
-          BezierLine(
-            label: "Duty",
-            data: data
+            bubbleIndicatorTitleStyle: TextStyle(
+              color: Colors.blue,
+            ),
+            bubbleIndicatorLabelStyle: TextStyle(
+              color: Colors.red,
+            ),
+            displayYAxis: true,
+            stepsYAxis: 1,
+            displayPreviousDataPointWhenNoValue: true,
+            backgroundGradient: LinearGradient(
+              colors: [
+                Colors.red[300],
+                Colors.red[400],
+                Colors.red[400],
+                Colors.red[500],
+                Colors.red,
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            footerHeight: 35.0,
           ),
-        ],
-        config: BezierChartConfig(
-          pinchZoom: true,
-          verticalIndicatorStrokeWidth: 3.0,
-          verticalIndicatorColor: Colors.black26,
-          showVerticalIndicator: true,
-          verticalIndicatorFixedPosition: false,
-          bubbleIndicatorTitleStyle: TextStyle(
-            color: Colors.blue,
-          ),
-          bubbleIndicatorLabelStyle: TextStyle(
-            color: Colors.red,
-          ),
-          displayYAxis: true,
-          stepsYAxis: 25,
-          backgroundGradient: LinearGradient(
-            colors: [
-              Colors.red[300],
-              Colors.red[400],
-              Colors.red[400],
-              Colors.red[500],
-              Colors.red,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-          footerHeight: 35.0,
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 //Example of the problem with BezierChartScale.HOURLY

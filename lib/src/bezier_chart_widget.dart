@@ -79,6 +79,7 @@ class BezierChart extends StatefulWidget {
   ///Notify if the `BezierChartScale` changed, it only works with date scales.
   final ValueChanged<BezierChartScale> onScaleChanged;
 
+  final bool isLiveView ;
   BezierChart({
     Key key,
     this.config,
@@ -95,6 +96,7 @@ class BezierChart extends StatefulWidget {
     this.onValueSelected,
     this.selectedValue,
     this.bezierChartAggregation = BezierChartAggregation.SUM,
+    this.isLiveView = true ,
     @required this.bezierChartScale,
     @required this.series,
     this.onScaleChanged,
@@ -416,7 +418,8 @@ class BezierChartState extends State<BezierChart>
           final space = (_contentWidth / _xAxisDataPoints.length);
           fixedPosition =
               Offset(isOnlyOneAxis ? 0.0 : (index * space) + space / 2, 0.0);
-          _scrollController.jumpTo((index * space));
+          _scrollController.animateTo((index * space) , duration: Duration(milliseconds: 1000),
+              curve: Curves.ease);
           setState(
             () {
               _verticalIndicatorPosition = fixedPosition;
@@ -433,7 +436,9 @@ class BezierChartState extends State<BezierChart>
           final jumpToX = (index * horizontalSpacing) -
               horizontalPadding / 2 -
               _keyScroll.currentContext.size.width / 2;
-          _scrollController.jumpTo(jumpToX);
+          _scrollController.animateTo(jumpToX ,
+              duration: Duration(milliseconds: 1000),
+              curve: Curves.ease );
 
           fixedPosition = Offset(
               isOnlyOneAxis
@@ -755,6 +760,9 @@ class BezierChartState extends State<BezierChart>
       _currentBezierChartScale = widget.bezierChartScale;
       _buildXDataPoints();
       _computeSeries();
+      if(widget.isLiveView) {
+        WidgetsBinding.instance.addPostFrameCallback(_onLayoutDone);
+      }
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -763,6 +771,7 @@ class BezierChartState extends State<BezierChart>
   void initState() {
     _currentBezierChartScale = widget.bezierChartScale;
     _scrollController = ScrollController();
+
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(
